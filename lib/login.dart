@@ -16,7 +16,7 @@ class _LoginState extends State<Login> {
   TextEditingController _textPid = TextEditingController();
 
   void _login(String pid) async {
-    final respond = await http.get("http://36.78.220.8:3000/Personal/$pid");
+    final respond = await http.get("http://192.168.0.1:3000/Personal/$pid");
     if (respond.statusCode == 200) {
       final result = jsonDecode(respond.body);
       nama = result["nama"];
