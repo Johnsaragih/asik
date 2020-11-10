@@ -1,6 +1,9 @@
-import 'package:asik/pages/cuti.dart';
+import 'package:asik/login.dart';
+import 'package:asik/pages/absen.dart';
+import 'package:asik/pages/timecard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -20,11 +23,9 @@ class _HomeState extends State<Home> {
             children: [
               _topMenu(),
               _mainMenu(context),
-         
             ],
           ),
         ),
- 
       ),
     );
   }
@@ -32,8 +33,32 @@ class _HomeState extends State<Home> {
 
 Widget _topMenu() {
   return new Container(
-    child: Row(
-      children: [Container(child: Text("datas"))],
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          child: Container(
+            child: Column(
+              children: [
+                Text(
+                  "Welcome to ASIK",
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Aplikasi System Informasi Karyawan",
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
     ),
     height: 130,
     decoration: BoxDecoration(
@@ -49,9 +74,19 @@ Widget _topMenu() {
 }
 
 Widget _mainMenu(context) {
+  void _logout() async {
+    SharedPreferences logout = await SharedPreferences.getInstance();
+    await logout.clear();
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => Login(),
+        ));
+  }
+
   return new SizedBox(
     //height: 400.0,
-    height: MediaQuery.of(context).size.height *0.60,
+    height: MediaQuery.of(context).size.height * 0.60,
     child: new Container(
       color: Colors.transparent,
       child: CustomScrollView(
@@ -67,21 +102,26 @@ Widget _mainMenu(context) {
                     iconColor: Colors.green,
                     label: "Personal",
                     onPres: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Cuti()));
+                     
                     },
                   ),
                   MenuIcon(
                     icon: Icons.shopping_cart,
                     iconColor: Colors.red,
                     label: "Timecard",
-                    onPres: () {},
+                    onPres: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Timecard()));
+                    },
                   ),
                   MenuIcon(
                     icon: Icons.monetization_on,
                     iconColor: Colors.green,
-                    label: "Cuti",
-                    onPres: () {},
+                    label: "Absen",
+                    onPres: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Absen()));
+                    },
                   ),
                   MenuIcon(
                     icon: Icons.airplay,
@@ -96,11 +136,12 @@ Widget _mainMenu(context) {
                     onPres: () {},
                   ),
                   MenuIcon(
-                    icon: Icons.storage,
-                    iconColor: Colors.green,
-                    label: "Info2",
-                    onPres: () {},
-                  ),
+                      icon: Icons.storage,
+                      iconColor: Colors.green,
+                      label: "Logout",
+                      onPres: () {
+                        _logout();
+                      }),
                   MenuIcon(
                     icon: Icons.textsms,
                     iconColor: Colors.red,
@@ -114,7 +155,6 @@ Widget _mainMenu(context) {
                     label: "Tentang",
                     onPres: () {},
                   ),
-                 
                 ],
               ),
             ]),
@@ -148,13 +188,20 @@ class MenuIcon extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Icon(icon, color: Colors.white,size: 40,),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
           ),
           SizedBox(
             height: 8.0,
           ),
-          Text(label,style: TextStyle(fontSize: 16.0),),
+          Text(
+            label,
+            style: TextStyle(fontSize: 16.0),
+          ),
         ],
       ),
     );
