@@ -35,7 +35,7 @@ class _TimecardState extends State<Timecard> {
 
   Future<List> gettimecard(String pid, String bulan, String tahun) async {
     final respond =
-        await http.get("http://36.78.220.8:3000/Timecard/$pid/$bulan/$tahun");
+        await http.get("http://11.78.220.8:3000/Timecard/$pid/$bulan/$tahun");
     if (respond.statusCode == 200) {
       print(pid);
       return jsonDecode(respond.body);
