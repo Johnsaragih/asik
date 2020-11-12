@@ -31,10 +31,10 @@ class _AbsenState extends State<Absen> {
   }
 
   Future<List> getabsen(String pid, String tahun) async {
-    final respond = await http.get("http://11.78.220.8:3000/Absen/$pid/$tahun");
+    final respond = await http.get("http://36.78.220.8:3000/Absen/$pid/$tahun");
+    
     if (respond.statusCode == 200) {
-      print(pid);
-      return jsonDecode(respond.body);
+          return jsonDecode(respond.body);
     } else {
       throw Exception('Failed load data');
     }
@@ -58,6 +58,7 @@ class _AbsenState extends State<Absen> {
       body: FutureBuilder<List>(
           future: getabsen(pid, tahun),
           builder: (context, snapshot) {
+          
             if (snapshot.hasError) print(snapshot.hasError);
             return snapshot.hasData
                 ? new DataAbsen(

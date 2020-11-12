@@ -33,11 +33,35 @@ class _TimecardState extends State<Timecard> {
     });
   }
 
-  Future<List> gettimecard(String pid, String bulan, String tahun) async {
-    final respond =
+
+ Future<List> gettimecard(String pid, String bulan,String tahun) async {
+   await _tcabsen(pid, bulan, tahun);
+   await _tcweb(pid, bulan, tahun);
+       final respond =
         await http.get("http://11.78.220.8:3000/Timecard/$pid/$bulan/$tahun");
     if (respond.statusCode == 200) {
-      print(pid);
+      return jsonDecode(respond.body);
+  
+    } else {
+      throw Exception('Failed load data');
+    }   
+  }
+
+
+  _tcweb(String pid, String bulan,String tahun) async {
+    final respond =
+        await http.get("http://11.78.220.8:3000/Timecardweb/$pid/$bulan/$tahun");
+    if (respond.statusCode == 200) {
+     _tcabsen(pid, bulan, tahun);
+    } else {
+      throw Exception('Failed load data');
+    }
+  }
+
+   _tcabsen(String pid, String bulan,String tahun) async {
+    final respond =
+        await http.get("http://11.78.220.8:3000/Timecardabsen/$pid/$bulan/$tahun");
+    if (respond.statusCode == 200) {
       return jsonDecode(respond.body);
     } else {
       throw Exception('Failed load data');
@@ -56,18 +80,40 @@ class _TimecardState extends State<Timecard> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          userName == null ? "kosong" : 'Timecard : ' + userName,
+          userName == null ? "NoName" : 'Timecard : ' + userName,
         ),
       ),
       body: FutureBuilder<List>(
           future: gettimecard(pid, bulan, tahun),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.hasError);
-            return snapshot.hasData
-                ? new TCpersonal(
-                    listtimecard: snapshot.data,
-                  )
-                : Center(child: CircularProgressIndicator());
+          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+             switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Container(
+                  child: Center(
+                    child: Text("No Connection"),
+                  ),
+                );
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+                return Container(
+                  child: Center(
+                    child: Text("Loading.."),
+                  ),
+                );
+              case ConnectionState.done:
+                if (snapshot.data.isEmpty) {
+                  return Container(
+                    child: Center(
+                      child: Text("NO data"),
+                    ),
+                  );
+                } else {
+                  return snapshot.hasData
+                      ? new TCpersonal(listtimecard: snapshot.data)
+                      : Center(child: CircularProgressIndicator());
+                }
+            }
+            return null;
           }),
     );
   }
@@ -82,21 +128,24 @@ class TCpersonal extends StatelessWidget {
     return ListView.builder(
       itemCount: listtimecard == null ? 0 : listtimecard.length,
       itemBuilder: (context, i) {
-        return Container(
+           return Container(
           child: Card(
             child: ListTile(
+              trailing: Text( listtimecard[i]['overtime'] == null  ? '0' : 'Ovt : ' + listtimecard[i]['overtime'].toString() ),
               title: Text(
-                'Tgl ' + listtimecard[i]['tgl'].substring(0, 10),
-                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16.0),
+                'Tgl ' + listtimecard[i]['tgl'].substring(0, 10) + ' Status ' +listtimecard[i]['absenstatus'], 
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
               ),
-              subtitle: Text('MSK: ' +
-                  listtimecard[i]['checkin'] +
-                  ' PLG: ' +
-                  listtimecard[i]['checkout'] +
-                  ' OVT: ' +
-                  listtimecard[i]['overtime'].toString(), style: TextStyle(fontSize: 16.0,color: Colors.blue[900]),),
+              subtitle: Text(
+                listtimecard[i]['checkin'] == null  ? '00' : 'Masuk 00 : ' + listtimecard[i]['checkin'] + ', ' + 'Pulang :'+ listtimecard[i] ['checkoutcount'],           
+                
+              ),
+              
+             
             ),
+            
           ),
+          
         );
       },
     );
