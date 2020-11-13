@@ -1,5 +1,6 @@
 import 'package:asik/login.dart';
 import 'package:asik/pages/absen.dart';
+import 'package:asik/pages/personal.dart';
 import 'package:asik/pages/timecard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -101,8 +102,9 @@ Widget _mainMenu(context) {
                     icon: Icons.local_library,
                     iconColor: Colors.green,
                     label: "Personal",
-                    onPres: () {
-                     
+                      onPres: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Personals()));
                     },
                   ),
                   MenuIcon(

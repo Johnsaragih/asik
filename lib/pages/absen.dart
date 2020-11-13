@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -31,9 +30,9 @@ class _AbsenState extends State<Absen> {
   }
 
   Future<List> getabsen(String pid, String tahun) async {
-    final respond = await http.get("http://11.78.220.8:3000/Absen/$pid/$tahun");
-    
-    if (respond.statusCode == 200) {
+    final respond = await http.get("http://36.78.220.8:3000/Absen/$pid/$tahun");
+  
+    if (respond.statusCode == 200) {    
           return jsonDecode(respond.body);
     } else {
       throw Exception('Failed load data');
@@ -77,6 +76,7 @@ class DataAbsen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+     
       itemCount: listabsen == null ? 0 : listabsen.length,
       itemBuilder: (context, i) {
         return Container(

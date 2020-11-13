@@ -33,34 +33,31 @@ class _TimecardState extends State<Timecard> {
     });
   }
 
-
- Future<List> gettimecard(String pid, String bulan,String tahun) async {
-   await _tcabsen(pid, bulan, tahun);
-   await _tcweb(pid, bulan, tahun);
-       final respond =
-        await http.get("http://11.78.220.8:3000/Timecard/$pid/$bulan/$tahun");
+  Future<List> gettimecard(String pid, String bulan, String tahun) async {
+    await _tcabsen(pid, bulan, tahun);
+    await _tcweb(pid, bulan, tahun);
+    final respond =
+        await http.get("http://36.78.220.8:3000/Timecard/$pid/$bulan/$tahun");
     if (respond.statusCode == 200) {
       return jsonDecode(respond.body);
-  
-    } else {
-      throw Exception('Failed load data');
-    }   
-  }
-
-
-  _tcweb(String pid, String bulan,String tahun) async {
-    final respond =
-        await http.get("http://11.78.220.8:3000/Timecardweb/$pid/$bulan/$tahun");
-    if (respond.statusCode == 200) {
-     _tcabsen(pid, bulan, tahun);
     } else {
       throw Exception('Failed load data');
     }
   }
 
-   _tcabsen(String pid, String bulan,String tahun) async {
-    final respond =
-        await http.get("http://11.78.220.8:3000/Timecardabsen/$pid/$bulan/$tahun");
+  _tcweb(String pid, String bulan, String tahun) async {
+    final respond = await http
+        .get("http://36.78.220.8:3000/Timecardweb/$pid/$bulan/$tahun");
+    if (respond.statusCode == 200) {
+      _tcabsen(pid, bulan, tahun);
+    } else {
+      throw Exception('Failed load data');
+    }
+  }
+
+  _tcabsen(String pid, String bulan, String tahun) async {
+    final respond = await http
+        .get("http://36.78.220.8:3000/Timecardabsen/$pid/$bulan/$tahun");
     if (respond.statusCode == 200) {
       return jsonDecode(respond.body);
     } else {
@@ -86,7 +83,7 @@ class _TimecardState extends State<Timecard> {
       body: FutureBuilder<List>(
           future: gettimecard(pid, bulan, tahun),
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-             switch (snapshot.connectionState) {
+            switch (snapshot.connectionState) {
               case ConnectionState.none:
                 return Container(
                   child: Center(
@@ -128,24 +125,30 @@ class TCpersonal extends StatelessWidget {
     return ListView.builder(
       itemCount: listtimecard == null ? 0 : listtimecard.length,
       itemBuilder: (context, i) {
-           return Container(
+        return Container(
           child: Card(
             child: ListTile(
-              trailing: Text( listtimecard[i]['overtime'] == null  ? '0' : 'Ovt : ' + listtimecard[i]['overtime'].toString() ),
+              trailing: Text(listtimecard[i]['overtime'] == null
+                  ? '0'
+                  : 'Overtime : ' + listtimecard[i]['overtime'].toString()),
               title: Text(
-                'Tgl ' + listtimecard[i]['tgl'].substring(0, 10) + ' Status ' +listtimecard[i]['absenstatus'], 
+                'Tgl ' +
+                    listtimecard[i]['tgl'].substring(0, 10) +
+                    ' Status ' +
+                    listtimecard[i]['absenstatus'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
               ),
               subtitle: Text(
-                listtimecard[i]['checkin'] == null  ? '00' : 'Masuk 00 : ' + listtimecard[i]['checkin'] + ', ' + 'Pulang :'+ listtimecard[i] ['checkoutcount'],           
-                
+                listtimecard[i]['checkin'] == null || listtimecard[i]['checkoutcount']==null
+                    ? 'No Data'
+                    : 'Masuk : ' +
+                        listtimecard[i]['checkin'] +
+                        ', ' +
+                        'Pulang :' +
+                        listtimecard[i]['checkoutcount'],
               ),
-              
-             
             ),
-            
           ),
-          
         );
       },
     );
